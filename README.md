@@ -1,5 +1,7 @@
 # Classificationbox Toolkit
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Build status](https://ci.appveyor.com/api/projects/status/s8md32wmfyrb96x9/branch/master?svg=true)](https://ci.appveyor.com/project/thomas694/classificationbox-toolkit/branch/master)
+
 You can use this toolkit to build your own image classification solution.<br/>
 The toolkit consists of two projects:
 - Classificationbox.Net - a .Net wrapper for Machine Box's Classificationbox service (.NET Standard 2.0 library)
@@ -62,7 +64,7 @@ docker run -p 8080:8080 -e "MB_KEY=$MB_KEY" machinebox/classificationbox
 Use the `imgclass.net` tool to train the model:
 
 ```
-imgclass.net -cb http://localhost:8080 -model Abc -src ./training-images -trainratio 0.8 -passes 3
+imgclass.net -cb http://localhost:8080 -model Abc -src C:\training-images -trainratio 0.8 -passes 3
 ```
 
 The tool will post a random 80% (`-trainratio 0.8`) of the images to Classificationbox for training, and the
@@ -79,7 +81,7 @@ On the next run they will be loaded again.
 After you have trained your model you can use `imgclass.net` tool to sort a folder of images
 
 ```
-imgclass.net -cb http://localhost:8080 -model Abc -src ./training-images -classify C:\ImageFolder -threshold 0.95
+imgclass.net -cb http://localhost:8080 -model Abc -src C:\training-images -classify C:\ImageFolder -threshold 0.95
 ```
 
 The tool requests an image class prediction for each image and moves the file to a subfolder according to the 
