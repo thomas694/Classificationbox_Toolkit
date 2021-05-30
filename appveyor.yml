@@ -20,6 +20,8 @@ install:
         Update-AppveyorBuild -Version "$s.$env:APPVEYOR_BUILD_NUMBER"
       }
 environment:
+  DeployApiCode:
+    secure: Umx/zsZC7BVyJ+HNpdOavb3XFgrgfy4P+pZ4PKhrd34=
   matrix:
   - job_name: build_skip
     job_group: build
@@ -101,7 +103,7 @@ deploy:
   description: 'Release description'
   provider: GitHub
   auth_token:
-    secure: PWzd/WicmutMxrc66FtBXAQMgCUKsX8yjeqv+2SHZyflLOTYZz5393rynVUtCltZ
+    secure: kECvxcX/55YfR6aAB6FJPlwCeIu3tg6csxq8/s2r011M/maHPc3DJbgMLKPzQr5/
   artifact: /.*\.zip/              # upload all zips to release assets
   draft: true
   prerelease: false
