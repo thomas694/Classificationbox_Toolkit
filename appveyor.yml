@@ -1,0 +1,106 @@
+#skip_branch_with_pr: true
+image: Visual Studio 2019
+install:
+  # Set "build version number" to current version or when tagged to "tag name"
+  - ps: >-
+      if ($env:APPVEYOR_REPO_TAG -eq "true")
+      {
+        $x = $env:APPVEYOR_REPO_TAG_NAME
+        if($x.startswith("v","CurrentCultureIgnoreCase")) { $x = $x.substring(1) }
+        $env:MY_BUILD_VERSION="$x"
+        $x = $x + ".$env:APPVEYOR_BUILD_NUMBER"
+        Update-AppveyorBuild -Version "$x"
+      }
+      else
+      {
+        Set-AppveyorBuildVariable -Name TT_VER -Value (& "$env:APPVEYOR_BUILD_FOLDER\scripts\get-version.ps1" -versionInfoFile "$env:APPVEYOR_BUILD_FOLDER\src\imgclass.net\Properties\AssemblyInfo.cs")
+        $s = $env:TT_VER
+        [VERSION]$vs = $s -replace '^.+((\d+\.){3}\d+).+', '$1'
+        $s = '{0}.{1}.{2}' -f $vs.Major,$vs.Minor,$vs.Build
+        Update-AppveyorBuild -Version "$s.$env:APPVEYOR_BUILD_NUMBER"
+      }
+environment:
+  matrix:
+  - job_name: build_skip
+    job_group: build
+  - job_name: build_Any_m
+    job_group: build
+  - job_name: build_Any
+    job_group: build
+  - job_name: deployZip
+    job_depends_on: build
+matrix:
+  fast_finish: true
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.cs'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+configuration: Release
+branches:
+  except:
+    - dummy_branch
+for:
+  -
+    matrix:
+      only:
+        - job_name: build_skip
+    skip_commits:
+      files:
+        - src/
+    skip_tags: true
+    init:
+      - appveyor exit
+    environment:
+      PLATFORM: Any CPU
+  -
+    matrix:
+      only:
+        - job_name: build_Any_m
+    only_commits:
+      files:
+        - src/
+    skip_tags: true
+    environment:
+      PLATFORM: Any CPU
+  -
+    matrix:
+      only:
+        - job_name: build_Any
+    skip_non_tags: true
+    environment:
+      PLATFORM: Any CPU
+  -
+    matrix:
+      only:
+        - job_name: deployZip
+    skip_non_tags: true
+    build: off
+    environment:
+      DeployNow: true
+before_build:
+- ps: scripts/appveyor-prebuild.ps1
+    nuget restore "src\Classificationbox_Toolkit.sln"
+build:
+  project: src\Classificationbox_Toolkit.sln
+  verbosity: normal
+after_build:
+- ps: scripts/appveyor-postbuild.ps1
+artifacts:
+- path: artifacts/*.zip
+  name: Classificationbox_Toolkit
+before_deploy:
+- ps: scripts/appveyor-predeploy.ps1
+deploy:
+  release: Classificationbox_Toolkit-v$(MY_BUILD_VERSION)
+  description: 'Release description'
+  provider: GitHub
+  auth_token:
+    secure: PWzd/WicmutMxrc66FtBXAQMgCUKsX8yjeqv+2SHZyflLOTYZz5393rynVUtCltZ
+  artifact: /.*\.zip/              # upload all zips to release assets
+  draft: true
+  prerelease: false
+  on:
+    #branch: master                 # release from master branch only
+    DeployNow: true                 # deploy on tag push only

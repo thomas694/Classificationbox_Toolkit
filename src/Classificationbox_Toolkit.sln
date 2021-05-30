@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31313.79
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgClass.Net", "imgclass.net\ImgClass.Net.csproj", "{6B79A2F6-89EB-40F6-B56B-0B398930B51A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Classificationbox.Net", "Classificationbox.Net\Classificationbox.Net.csproj", "{70FA73DF-F39D-49FD-8084-59F665B283BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6B79A2F6-89EB-40F6-B56B-0B398930B51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B79A2F6-89EB-40F6-B56B-0B398930B51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B79A2F6-89EB-40F6-B56B-0B398930B51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B79A2F6-89EB-40F6-B56B-0B398930B51A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70FA73DF-F39D-49FD-8084-59F665B283BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70FA73DF-F39D-49FD-8084-59F665B283BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70FA73DF-F39D-49FD-8084-59F665B283BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70FA73DF-F39D-49FD-8084-59F665B283BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7BB5BA98-F07E-4E52-BB8E-8966C7C32BA8}
+	EndGlobalSection
+EndGlobal
