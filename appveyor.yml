@@ -81,7 +81,11 @@ for:
       DeployNow: true
 before_build:
 - ps: scripts/appveyor-prebuild.ps1
+
     nuget restore "src\Classificationbox_Toolkit.sln"
+
+    dotnet restore "src\Classificationbox_Toolkit.sln"
+
 build:
   project: src\Classificationbox_Toolkit.sln
   verbosity: normal
