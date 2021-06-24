@@ -79,7 +79,7 @@ namespace ImgClass.Net
             if (!list.Any(x => x.name == _modelName))
             {
                 MyLog("No models found, trying to load saved model...");
-                if (File.Exists(_modelName + ".machinebox.classificationbox"))
+                if (File.Exists(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox")))
                 {
                     svc.LoadModel(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox"));
                     ret = svc.ListModels();
@@ -151,7 +151,7 @@ namespace ImgClass.Net
             if (!list.Any(x => x.name == _modelName))
             {
                 MyLog("No models found, trying to load saved model...");
-                if (File.Exists(_modelName + ".machinebox.classificationbox"))
+                if (File.Exists(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox")))
                 {
                     svc.LoadModel(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox"));
                     ret = svc.ListModels();
@@ -189,9 +189,12 @@ namespace ImgClass.Net
         protected List<FileEntry> LoadFiles(string basePath)
         {
             MyLog("Reading files...");
+            var ignoredExts = new List<string>() { ".mp4", ".mp3", ".json" };
             var list = new List<FileEntry>();
             foreach (var filename in Directory.GetFiles(basePath))
             {
+                if (ignoredExts.Contains(Path.GetExtension(filename).ToLower())) continue;
+
                 list.Add(new FileEntry() { fn = filename });
             }
             return list;
