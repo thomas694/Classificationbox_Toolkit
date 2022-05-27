@@ -237,6 +237,21 @@ namespace ImgClass.Net
 
         protected void LoadFilesAndBuildGroups(string basePath, double ratio)
         {
+            MyLog("Cleaning orphaned file entries...");
+            foreach (var key in _files.Keys)
+            {
+                int orphanCount = 0;
+                for (var i = _files[key].Count - 1; i >= 0; i--)
+                {
+                    if (!File.Exists(_files[key][i].fn))
+                    {
+                        _files[key].RemoveAt(i);
+                        orphanCount++;
+                    }
+                }
+                if (orphanCount > 0) MyLog($"{key}: removed {orphanCount} orphaned entries");
+            }
+
             MyLog("Reading new files...");
             foreach (var path in Directory.GetDirectories(basePath))
             {
