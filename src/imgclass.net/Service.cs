@@ -68,6 +68,18 @@ namespace ImgClass.Net
             Console.WriteLine(msg);
         }
 
+        private void LoadSavedModel()
+        {
+            svc.LoadModel(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox"));
+            var ret = svc.ListModels();
+            var list = ret.models;
+            if (list == null || !list.Any(x => x.name == _modelName))
+            {
+                MyLog($"Model '{_modelName}' couldn't be loaded, exiting...");
+                Environment.Exit((int)EXIT_CODES.ERR_LOADING_MODEL);
+            }
+        }
+
         public void TrainModel(double ratio, int passes)
         {
             _ratio = ratio;
@@ -81,14 +93,7 @@ namespace ImgClass.Net
                 MyLog("No models found, trying to load saved model...");
                 if (File.Exists(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox")))
                 {
-                    svc.LoadModel(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox"));
-                    ret = svc.ListModels();
-                    list = ret.models;
-                    if (list == null || !list.Any(x => x.name == _modelName))
-                    {
-                        MyLog($"Model '{_modelName}' couldn't be loaded, exiting...");
-                        Environment.Exit((int)EXIT_CODES.ERR_LOADING_MODEL);
-                    }
+                    LoadSavedModel();
                 }
                 else
                 {
@@ -133,10 +138,10 @@ namespace ImgClass.Net
                 TrainModel(_modelId);
                 Thread.Sleep(5000);
                 PredictFiles(_modelId);
+                MyLog("Saving model...");
+                svc.SaveModel(_modelId, Path.Combine(_basePath, _modelName + ".machinebox.classificationbox"));
             }
 
-            MyLog("Saving model...");
-            svc.SaveModel(_modelId, Path.Combine(_basePath, _modelName + ".machinebox.classificationbox"));
             SaveState(Path.Combine(_basePath, _modelName + "_files.db"));
         }
 
@@ -153,14 +158,7 @@ namespace ImgClass.Net
                 MyLog("No models found, trying to load saved model...");
                 if (File.Exists(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox")))
                 {
-                    svc.LoadModel(Path.Combine(_basePath, _modelName + ".machinebox.classificationbox"));
-                    ret = svc.ListModels();
-                    list = ret.models;
-                    if (list == null || !list.Any(x => x.name == _modelName))
-                    {
-                        MyLog($"Model '{_modelName}' couldn't be loaded, exiting...");
-                        Environment.Exit((int)EXIT_CODES.ERR_LOADING_MODEL);
-                    }
+                    LoadSavedModel();
                 }
                 else
                 {
@@ -338,7 +336,12 @@ namespace ImgClass.Net
                         cont = true;
                         var fileList = _files[className];
                         var entry = fileList[trainList[0]];
-                        svc.TeachModel(modelId, className, entry.fn);
+                        var result = svc.TeachModel(modelId, className, entry.fn);
+                        if (result == "{\n\t\"success\": false,\n\t\"error\": \"Not found\"\n}")
+                        {
+                            LoadSavedModel();
+                            result = svc.TeachModel(modelId, className, entry.fn);
+                        }
                         fileList[trainList[0]] = new FileEntry() { fn = entry.fn, st = 2 };
                         trainList.RemoveAt(0);
                         MyLog(string.Format("training {0}: {1}", x++, entry.fn));
@@ -360,6 +363,11 @@ namespace ImgClass.Net
 
                     FileEntry entry = list[i];
                     var pd = svc.Predict(modelId, entry.fn);
+                    if (pd?.success == false && pd.error == "Not found")
+                    {
+                        LoadSavedModel();
+                        pd = svc.Predict(modelId, entry.fn);
+                    }
                     if (pd != null && pd.success)
                         MyLog(string.Format("p{0}: {1} {2}/{3:0.00} {4}", n++, (pd.classes[0].id == className), pd.classes[0].id, pd.classes[0].score, entry.fn));
                 }
